@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+require 'openssl'
+require 'optparse'
+
+options = {
+  ca_cert: '/etc/puppetlabs/puppet/ssl/ca/ca_crt.pem',
+  ca_key: '/etc/puppetlabs/puppet/ssl/ca/ca_key.pem',
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'usage: add-cli-auth-to-certificate [options] certificate...'
+
+  opts.on('-c', '--ca-cert=PATH', 'Path to the CA certificate') do |path|
+    options[:ca_cert] = path
+  end
+  opts.on('-k', '--ca-key=PATH', 'Path to the CA private key') do |path|
+    options[:ca_key] = path
+  end
+end.parse!
+
+ca_certificate = OpenSSL::X509::Certificate.new(File.read(options[:ca_cert]))
+ca_key = OpenSSL::PKey::RSA.new(File.read(options[:ca_key]))
+
+OpenSSL::ASN1::ObjectId.register('1.3.6.1.4.1.34380.1.3.39', 'cliauth', 'cliauth')
+
+ARGV.each do |filename|
+  certificate = OpenSSL::X509::Certificate.new(File.read(filename))
+
+  ef = OpenSSL::X509::ExtensionFactory.new
+  ef.subject_certificate = certificate
+  ef.issuer_certificate = ca_certificate
+
+  asn1 = OpenSSL::ASN1::UTF8String('true')
+  certificate.add_extension(ef.create_extension('cliauth', "DER:#{asn1.to_der.unpack('H*')[0]}"))
+  certificate.sign(ca_key, OpenSSL::Digest::SHA256.new)
+
+  FileUtils.mv(filename, "#{filename}.bak")
+  File.write(filename, certificate.to_s)
+end
