@@ -1,6 +1,6 @@
 # puppet-add-cli-auth-to-certificate
 
-puppetlabs/puppetserver#1790 introduced a new extension in the certificate of
+[puppetlabs/puppetserver#1790](https://github.com/puppetlabs/puppetserver/pull/1790) introduced a new extension in the certificate of
 the master's host, needed to authenticate against the
 `/puppet-ca/v1/certificate_status` and `/puppet-ca/v1/certificate_statuses` API
 endpoints.  This extension is necessary to use
