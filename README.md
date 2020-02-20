@@ -22,7 +22,7 @@ Related links:
 On AIO nodes, the call sequence is as simple as:
 
 ```sh
-./add-cli-auth-to-certificate /etc/puppetlabs/puppet/ssl/certs/$(hostname -f).pem
+/opt/puppetlabs/puppet/bin/ruby ./add-cli-auth-to-certificate /etc/puppetlabs/puppet/ssl/certs/$(hostname -f).pem
 ```
 
 If the `ssldir` is not the AIO default one, it's possible to explicitly provide the path to the ca certificate and key:

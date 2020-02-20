@@ -1,4 +1,4 @@
-#!/usr/bin/env /opt/puppetlabs/puppet/bin/ruby
+#!/usr/bin/env ruby
 
 require 'fileutils'
 require 'openssl'
